@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Data
 {
+    // Klasa Ball dziedziczy po klasie abstrakcyjnej DataApi i implementuje
+    // metody abstrakcyjne zdefiniowane w klasie bazowej
     internal class Ball : DataApi
     {
         private double positionX;
