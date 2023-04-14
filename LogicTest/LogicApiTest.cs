@@ -23,4 +23,4 @@ namespace LogicTest
             Assert.AreEqual(ballSteps.Y, ((nextPosition.Y - position.Y) / steps) + position.Y);
         }
     }
-}}
+}
