@@ -6,8 +6,8 @@ namespace ViewModel
 {
     public class BallVM
     {
-        private double r = 15; // promień piłki
         private BallModel ball; // model piłki
+        private double r = 20; // promień piłki
         private double X; // położenie piłki na osi X
         private double Y; // położenie piłki na osi Y
 
@@ -50,7 +50,6 @@ namespace ViewModel
             set
             {
                 ball.ModelXPosition = value;
-                RaisePropertyChanged("XPos"); // aktualizacja powiązanych z tą właściwością elementów interfejsu użytkownika
             }
         }
 
@@ -64,7 +63,6 @@ namespace ViewModel
             set
             {
                 ball.ModelYPosition = value;
-                RaisePropertyChanged("YPos"); // aktualizacja powiązanych z tą właściwością elementów interfejsu użytkownika
             }
         }
 
