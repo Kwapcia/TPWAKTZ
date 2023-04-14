@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    internal class BallModelCollection
+    public class BallModelCollection
     {
         List<BallModel> ballColl;
         private LogicApi logic;
