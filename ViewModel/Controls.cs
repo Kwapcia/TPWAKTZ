@@ -5,9 +5,9 @@ using System.Collections.ObjectModel;
 using System.Numerics;
 using Logic;
 
-namespace ViewModel
+namespace ViewModel 
 {
-    public class Controls
+    public class Controls : VM
     {
         BallVM ball;
 
@@ -58,6 +58,7 @@ namespace ViewModel
             set
             {
                 items = value;
+                RaisePropertyChanged("Items");
             }
         }
         private void AddBallClickHandler()
@@ -92,6 +93,7 @@ namespace ViewModel
             {
                 ballAmountText = value;
                 ballAmount = int.Parse(ballAmountText);
+                RaisePropertyChanged("BallAmountText");
             }
         }
 

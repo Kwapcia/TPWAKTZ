@@ -3,10 +3,63 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:View"
+        xmlns:vm="clr-namespace:ViewModel;assembly=ViewModel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="TPW" Height="800" Width="800"
+        MinHeight="750" MinWidth="750"
+        Background="LightBlue">
+    <Window.DataContext>
+        <vm:Controls/>
+    </Window.DataContext>
+    <Viewbox Stretch="Fill"
+           Width="700"
+           Height="700">
 
-    </Grid>
+        <StackPanel Orientation="Vertical">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="20*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="PLAY" 
+                    Command="{Binding CreateBallsButtonClick}"
+                    FontSize="15" 
+
+                    Foreground="White"
+                    HorizontalAlignment="Left" 
+                
+                    Grid.Column="2" 
+                    Background="Green" 
+                    Width="100"
+                    BorderBrush="Black" Grid.ColumnSpan="2" Margin="159,0,0,0"/>
+
+
+            </Grid>
+            <Canvas x:Name="canvasArea" Width="800" Height="800" Background="LightBlue">
+                <Rectangle Fill="Transparent" Stroke="Green" StrokeThickness="3" Width="780" Height="780" Margin="10"/>
+            </Canvas>
+
+            <ItemsControl x:Name="ic" ItemsSource="{Binding Items}">
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type vm:BallVM}">
+                        <Ellipse Fill="Violet" Stroke="LightBlue" StrokeThickness="1" Width="30" Height="30"/>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="{x:Type ContentPresenter}">
+                        <Setter Property="Canvas.Left" Value="{Binding XPos}"/>
+                        <Setter Property="Canvas.Bottom" Value="{Binding YPos}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+        </StackPanel>
+    </Viewbox>
 </Window>
