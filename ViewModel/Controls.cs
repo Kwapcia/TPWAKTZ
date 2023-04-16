@@ -5,13 +5,13 @@ using System.Collections.ObjectModel;
 using System.Numerics;
 using Logic;
 
-namespace ViewModel 
+namespace ViewModel
 {
     public class Controls : VM
     {
-        BallVM ball;
+        Ball ball;
 
-        private ObservableCollection<BallVM> items;
+        private ObservableCollection<Ball> items;
         private static System.Timers.Timer? targetTimer;
         private static System.Timers.Timer? positionTimer;
         private string ballAmountText = "1";
@@ -24,7 +24,7 @@ namespace ViewModel
             CreateBallsButtonClick = new Commands(() => getBallVMCollection());
             AddBallButtonClick = new Commands(() => AddBallClickHandler());
             RemoveBallButtonClick = new Commands(() => RemoveBallButtonClickHandler());
-            ball = new BallVM();
+            ball = new Ball();
         }
 
         public ICommand CreateBallsButtonClick { get; set; }
@@ -42,14 +42,14 @@ namespace ViewModel
             {
                 targetTimer.Stop();
             }
-            Items = new ObservableCollection<BallVM>();
+            Items = new ObservableCollection<Ball>();
             BallVMCollection ballVMColl = new BallVMCollection();
             Items = ballVMColl.CreateBallVMCollection(ballAmount);
             initBalls();
             initMovement();
         }
 
-        public ObservableCollection<BallVM> Items
+        public ObservableCollection<Ball> Items
         {
             get
             {
@@ -120,7 +120,7 @@ namespace ViewModel
         {
             foreach (var x in Items)
             {
-                if (x is BallVM)
+                if (x is Ball)
                 {
                     Vector2 currentPos = new Vector2((float)x.XPos, (float)x.YPos);
                     Vector2 a = ((x.NextPosition - currentPos) / fr) + currentPos;

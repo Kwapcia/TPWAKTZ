@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ViewModel
 {
-    public class BallVM : VM
+    public class Ball : VM
     {
         private BallModel ball; // model piłki
         private double r = 15; // promień piłki
@@ -12,13 +12,13 @@ namespace ViewModel
         private double Y; // położenie piłki na osi Y
 
         // konstruktor domyślny
-        public BallVM()
+        public Ball()
         {
             ball = new BallModel();
         }
 
         // konstruktor z modelem piłki jako argument
-        public BallVM(BallModel ballModel)
+        public Ball(BallModel ballModel)
         {
             X = ballModel.ModelXPosition;
             Y = ballModel.ModelYPosition;

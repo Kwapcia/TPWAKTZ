@@ -10,7 +10,7 @@ namespace ViewModel
 {
     internal class BallVMCollection
     {
-        public ObservableCollection<BallVM> CreateBallVMCollection(int quantity)
+        public ObservableCollection<Ball> CreateBallVMCollection(int quantity)
         {
             // Utworzenie obiektu BallModelCollection i wywołanie metody tworzącej kolekcję Modeli piłek
             BallModelCollection bMC = new BallModelCollection();
@@ -19,13 +19,13 @@ namespace ViewModel
             List<BallModel> ballCollection = bMC.GetBallModelCollection();
 
             // Utworzenie pustej kolekcji ViewModeli piłek
-            ObservableCollection<BallVM> ballVMCollection = new ObservableCollection<BallVM>();
+            ObservableCollection<Ball> ballVMCollection = new ObservableCollection<Ball>();
 
             // Iteracja przez kolekcję Modeli piłek i tworzenie ViewModeli na ich podstawie
             foreach (BallModel ballM in ballCollection)
             {
                 // Utworzenie ViewModelu piłki na podstawie Modelu
-                BallVM ballVM = new BallVM(ballM);
+                Ball ballVM = new Ball(ballM);
 
                 // Ustawienie właściwości pozycji ViewModelu na wartości pozycji Modelu
                 ballVM.XPos = ballM.ModelXPosition;
