@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestData
 {
+
 	[TestClass]
 	public class DataCreationTest
 	{
