@@ -1,65 +1,141 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Data
 {
+    public interface IBall : INotifyPropertyChanged
+    {
+        int ballId { get; }
+        int ballSize { get; }
+        double ballWeight { get; }
+        double ballX { get; set; }
+        double ballY { get; set; }
+        double ballNewX { get; set; }
+        double ballNewY { get; set; }
+
+        void ballMove();
+        void ballCreateMovementTask(int interval);
+        void ballStop();
+    }
     // Klasa Ball dziedziczy po klasie abstrakcyjnej DataApi i implementuje
     // metody abstrakcyjne zdefiniowane w klasie bazowej
-    internal class Ball : DataApi
+    internal class Ball : IBall
     {
-        private double positionX;
-        private double positionY;
+            private readonly int size;
+            private readonly int id;
+            private double x;
+            private double y;
+            private double newX;
+            private double newY;
+            private readonly double weight;
+            private readonly Stopwatch stopwatch = new Stopwatch();
+            private Task task;
+            private bool stop = false;
 
-        public Ball(double x, double y)
+
+
+        public Ball(int indentyfikator, int size, double x, double y,double newX,double newY,double weight)
         {
-            positionX = x;
-            positionY = y;
+                id = identyfikator;
+                this.size = size;
+                this.x = x;
+                this.y = y;
+                this.newX = newX;
+                this.newY = newY;
+                this.weight = weight;
         }
 
-        public override double getXPosition()
+        public int ballId { get => id; }
+        public int ballSize { get => size; }
+        public double ballNewX
         {
-            return positionX;
-        }
-
-        public override double getYPosition()
-        {
-            return positionY;
-        }
-
-        public override void setXPosition(double newX)
-        {
-            positionX = newX;
-        }
-
-        public override void setYPosition(double newY)
-        {
-            positionY = newY;
-        }
-
-        public double X
-        {
-            get
-            {
-                return positionX;
-            }
+            get => newX;
             set
             {
-                positionX = value;
+                if(value.Equals(newX))
+                {
+                    return;
+                }
+                newX = value;
             }
         }
-        public double Y
+        public double ballNewY
         {
-            get
-            {
-                return positionY;
-            }
+            get => newY;
             set
             {
-                positionY = value;
+                if (value.Equals(newY))
+                {
+                    return;
+                }
+                newY = value;
             }
         }
+        public double ballX
+        {
+            get => x;
+            set
+            {
+                if(value.Equals(x))
+                {
+                    return;
+                }
+                x = value;
+                RaisePropertyChanged();
+            }
+        }
+        public double ballY
+        {
+            get => y;
+            set
+            {
+                if(value.Equals(y))
+                {
+                    return;
+                }
+                y = value;
+                RaisePropertyChanged();
+            }
+        }
+        public void ballMove()
+        {
+            ballX += ballNewX;
+            ballY+= ballNewY;
+        }
+        public double ballWeight { get => weight; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        internal void RaisePropertyChanged([CallerMemberName]string propertyName=null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        public void ballCreateMovementTask (int interval)
+        {
+            stop = false;
+            task = Run(interval);
+        }
+        private async Task Run (int interval)
+        {
+            while(!stop)
+            {
+                stopwatch.Reset();
+                stopwatch.Start();
+                if(!stop)
+                {
+                    ballMove();
+                }
+                stopwatch.Stop();
+                await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
+            }
+        }
+        public void ballStop()
+        {
+            stop = true;
+        } 
     }
 }
