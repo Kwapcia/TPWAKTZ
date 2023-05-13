@@ -19,6 +19,7 @@ namespace Data
             return new DataApi(width,height);
         }
     }
+
     internal class DataApi : DataAbstractApi
     {
         private ObservableCollection<IBall> balls { get; }
@@ -41,7 +42,7 @@ namespace Data
             if(count > 0)
             {
                 int ballsCount = balls.Count;
-                for(int i=0;i<count;i++)
+                for(int i = 0 ; i < count ; i++)
                 {
                     mutex.WaitOne();
                     int r = 20;
@@ -60,7 +61,7 @@ namespace Data
             }
             if(count < 0)
             {
-                for (int i= count;i<0;i++)
+                for (int i = count ; i < 0 ; i++)
                 {
                     if(balls.Count > 0)
                     {
@@ -73,6 +74,7 @@ namespace Data
             return balls;
 
         }
+
         public override int getAmount { get => balls.Count; }
 
         public override IBall getBall(int index)

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Data
 {
+
     public interface IBall : INotifyPropertyChanged
     {
         int ballId { get; }
@@ -62,6 +63,7 @@ namespace Data
                 {
                     return;
                 }
+
                 newX = value;
             }
         }
@@ -74,6 +76,7 @@ namespace Data
                 {
                     return;
                 }
+
                 newY = value;
             }
         }
@@ -86,6 +89,7 @@ namespace Data
                 {
                     return;
                 }
+
                 x = value;
                 RaisePropertyChanged();
             }
@@ -99,6 +103,7 @@ namespace Data
                 {
                     return;
                 }
+
                 y = value;
                 RaisePropertyChanged();
             }
@@ -106,19 +111,24 @@ namespace Data
         public void ballMove()
         {
             ballX += ballNewX;
-            ballY+= ballNewY;
+            ballY += ballNewY;
         }
+
         public double ballWeight { get => weight; }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
         internal void RaisePropertyChanged([CallerMemberName]string propertyName=null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
         public void ballCreateMovementTask (int interval)
         {
             stop = false;
             task = Run(interval);
         }
+
         private async Task Run (int interval)
         {
             while(!stop)
@@ -129,10 +139,12 @@ namespace Data
                 {
                     ballMove();
                 }
+
                 stopwatch.Stop();
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }
         }
+
         public void ballStop()
         {
             stop = true;
