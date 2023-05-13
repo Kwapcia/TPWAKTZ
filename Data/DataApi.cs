@@ -5,8 +5,8 @@ using System.Threading;
 
 namespace Data
 {
-    public abstract class DataAbstractApi
 
+    public abstract class DataAbstractApi
     {
         public abstract int getAmount { get; }
         public abstract IList createBallsList(int count);
@@ -24,7 +24,9 @@ namespace Data
     {
         private ObservableCollection<IBall> balls { get; }
         private readonly Mutex mutex = new Mutex();
+
         private readonly Random random = new Random();
+
         public override int width { get; }
         public override int height { get; }
 

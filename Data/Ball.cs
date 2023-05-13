@@ -53,7 +53,9 @@ namespace Data
         }
 
         public int ballId { get => id; }
+
         public int ballSize { get => size; }
+
         public double ballNewX
         {
             get => newX;
@@ -67,6 +69,7 @@ namespace Data
                 newX = value;
             }
         }
+
         public double ballNewY
         {
             get => newY;
@@ -80,6 +83,7 @@ namespace Data
                 newY = value;
             }
         }
+
         public double ballX
         {
             get => x;
@@ -139,7 +143,6 @@ namespace Data
                 {
                     ballMove();
                 }
-
                 stopwatch.Stop();
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }
