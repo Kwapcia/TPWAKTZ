@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data
 {
@@ -28,28 +23,28 @@ namespace Data
     // metody abstrakcyjne zdefiniowane w klasie bazowej
     internal class Ball : IBall
     {
-            private readonly int size;
-            private readonly int id;
-            private double x;
-            private double y;
-            private double newX;
-            private double newY;
-            private readonly double weight;
-            private readonly Stopwatch stopwatch = new Stopwatch();
-            private Task task;
-            private bool stop = false;
+        private readonly int size;
+        private readonly int id;
+        private double x;
+        private double y;
+        private double newX;
+        private double newY;
+        private readonly double weight;
+        private readonly Stopwatch stopwatch = new Stopwatch();
+        private Task task;
+        private bool stop = false;
 
 
 
-        public Ball(int indentyfikator, int size, double x, double y,double newX,double newY,double weight)
+        public Ball(int indentyfikator, int size, double x, double y, double newX, double newY, double weight)
         {
-                id = indentyfikator;
-                this.size = size;
-                this.x = x;
-                this.y = y;
-                this.newX = newX;
-                this.newY = newY;
-                this.weight = weight;
+            id = indentyfikator;
+            this.size = size;
+            this.x = x;
+            this.y = y;
+            this.newX = newX;
+            this.newY = newY;
+            this.weight = weight;
         }
 
         public int ballId { get => id; }
@@ -61,7 +56,7 @@ namespace Data
             get => newX;
             set
             {
-                if(value.Equals(newX))
+                if (value.Equals(newX))
                 {
                     return;
                 }
@@ -89,7 +84,7 @@ namespace Data
             get => x;
             set
             {
-                if(value.Equals(x))
+                if (value.Equals(x))
                 {
                     return;
                 }
@@ -103,7 +98,7 @@ namespace Data
             get => y;
             set
             {
-                if(value.Equals(y))
+                if (value.Equals(y))
                 {
                     return;
                 }
@@ -122,24 +117,24 @@ namespace Data
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        internal void RaisePropertyChanged([CallerMemberName]string propertyName=null)
+        internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void ballCreateMovementTask (int interval)
+        public void ballCreateMovementTask(int interval)
         {
             stop = false;
             task = Run(interval);
         }
 
-        private async Task Run (int interval)
+        private async Task Run(int interval)
         {
-            while(!stop)
+            while (!stop)
             {
                 stopwatch.Reset();
                 stopwatch.Start();
-                if(!stop)
+                if (!stop)
                 {
                     ballMove();
                 }
@@ -151,6 +146,6 @@ namespace Data
         public void ballStop()
         {
             stop = true;
-        } 
+        }
     }
 }

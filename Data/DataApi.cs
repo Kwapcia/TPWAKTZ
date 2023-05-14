@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace Data
 {
@@ -12,11 +10,11 @@ namespace Data
         public abstract IList createBallsList(int count);
         public abstract int width { get; }
         public abstract int height { get; }
-        public abstract IBall getBall (int index);
+        public abstract IBall getBall(int index);
 
         public static DataAbstractApi createApi(int width, int height)
         {
-            return new DataApi(width,height);
+            return new DataApi(width, height);
         }
     }
 
@@ -41,10 +39,10 @@ namespace Data
 
         public override IList createBallsList(int count)
         {
-            if(count > 0)
+            if (count > 0)
             {
                 int ballsCount = balls.Count;
-                for(int i = 0 ; i < count ; i++)
+                for (int i = 0; i < count; i++)
                 {
                     mutex.WaitOne();
                     int r = 20;
@@ -52,8 +50,8 @@ namespace Data
                     double weight = pom;
                     double x = random.Next(r, width - r);
                     double y = random.Next(r, height - r);
-                    double newX = random.Next(- 10, 10) + random.NextDouble();
-                    double newY = random.Next(-10,10)+ random.NextDouble();
+                    double newX = random.Next(-10, 10) + random.NextDouble();
+                    double newY = random.Next(-10, 10) + random.NextDouble();
                     Ball ball = new Ball(i + 1 + ballsCount, r, x, y, newX, newY, weight);
 
                     balls.Add(ball);
@@ -61,14 +59,14 @@ namespace Data
 
                 }
             }
-            if(count < 0)
+            if (count < 0)
             {
-                for (int i = count ; i < 0 ; i++)
+                for (int i = count; i < 0; i++)
                 {
-                    if(balls.Count > 0)
+                    if (balls.Count > 0)
                     {
                         mutex.WaitOne();
-                        balls.Remove(balls[balls.Count-1]); 
+                        balls.Remove(balls[balls.Count - 1]);
                         mutex.ReleaseMutex();
                     };
                 }

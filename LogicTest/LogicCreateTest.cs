@@ -1,5 +1,5 @@
-﻿ using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Logic;
+﻿using Logic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LogicTest
 {

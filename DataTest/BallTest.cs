@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Data;
+﻿using Data;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataTest
 {
@@ -7,7 +7,7 @@ namespace DataTest
     public class BallTest
     {
         private DataAbstractApi Api;
-        
+
         [TestMethod]
         public void moveTest()
         {

@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Data;
 using System.Collections;
-using System.Threading;
-using Data;
-using System.Numerics;
 using System.ComponentModel;
 
 namespace Logic
@@ -85,7 +82,7 @@ namespace Logic
         // Metoda stop zatrzymuje ruch wszystkich piłek w grze
         public override void stop()
         {
-            for (int i = 0; i < dataLayer.getAmount; i++ )
+            for (int i = 0; i < dataLayer.getAmount; i++)
             {
                 dataLayer.getBall(i).ballStop();
             }
@@ -98,24 +95,24 @@ namespace Logic
             double right = width - diameter;
             double down = height - diameter;
 
-            if(ball.ballX <= 0)
+            if (ball.ballX <= 0)
             {
                 ball.ballX = -ball.ballX;
                 ball.ballNewX = -ball.ballNewX;
             }
-            else if (ball.ballX>=right)
+            else if (ball.ballX >= right)
             {
-                ball.ballX = right - (ball.ballX-right);
+                ball.ballX = right - (ball.ballX - right);
                 ball.ballNewX = -ball.ballNewX;
             }
-            if(ball.ballY<=0)
+            if (ball.ballY <= 0)
             {
                 ball.ballY = -ball.ballY;
-                ball.ballNewY=-ball.ballNewY;
+                ball.ballNewY = -ball.ballNewY;
             }
-            else if(ball.ballY>=down)
+            else if (ball.ballY >= down)
             {
-                ball.ballY=down-(ball.ballY-down);
+                ball.ballY = down - (ball.ballY - down);
                 ball.ballNewY = -ball.ballNewY;
             }
         }
@@ -123,14 +120,14 @@ namespace Logic
         // Metoda bounce odpowiada za detekcję kolizji między piłkami i zmianę ich kierunku i prędkości
         public override void bounce(IBall ball)
         {
-            for(int i=0;i<dataLayer.getAmount;i++)
+            for (int i = 0; i < dataLayer.getAmount; i++)
             {
                 IBall secondBall = dataLayer.getBall(i);
-                if(ball.ballId == secondBall.ballId)
+                if (ball.ballId == secondBall.ballId)
                 {
                     continue;
                 }
-                if(collision(ball,secondBall))
+                if (collision(ball, secondBall))
                 {
                     double m1 = ball.ballWeight;
                     double m2 = secondBall.ballWeight;
@@ -154,9 +151,9 @@ namespace Logic
         }
 
         // Metoda collision służy do sprawdzania, czy dwie piłki nachodzą na siebie
-        internal bool collision (IBall a,IBall b)
+        internal bool collision(IBall a, IBall b)
         {
-            if(a==null || b == null)
+            if (a == null || b == null)
             {
                 return false;
             }
@@ -181,7 +178,7 @@ namespace Logic
             // dla każdej nowo utworzonej kuli, funkcja podłącza metodę changeBallPosition do zdarzenia PropertyChanged,
             // co umożliwia automatyczne przemieszczanie kuli w czasie rzeczywistym.
             IList temp = dataLayer.createBallsList(count);
-            for ( int i = 0; i < dataLayer.getAmount - previousCount; i++ )
+            for (int i = 0; i < dataLayer.getAmount - previousCount; i++)
             {
                 dataLayer.getBall(previousCount + i).PropertyChanged += changeBallPosition;
             }
@@ -196,7 +193,7 @@ namespace Logic
         }
 
         // zwraca ilość kul znajdujących się na liście kul w obiekcie klasy DataLayer
-        public override int getAmount { get=>dataLayer.getAmount; }
+        public override int getAmount { get => dataLayer.getAmount; }
 
         //  jest metodą wywoływaną za każdym razem, gdy pozycja kuli zmienia się. Funkcja ta sprawdza,
         //  czy kula zderza się ze ścianą, a następnie wywołuje metodę bounce, aby sprawdzić, czy kula zderza się z inną kulą.
