@@ -10,7 +10,7 @@
         MinHeight="750" MinWidth="750"
         Background="LightBlue">
     <Window.DataContext>
-        <vm:Controls/>
+        <vm:MainWindowViewModel/>
     </Window.DataContext>
     <Viewbox Stretch="Fill"
            Width="700"
@@ -85,7 +85,7 @@
 
             <ItemsControl x:Name="ic" ItemsSource="{Binding Items}">
                 <ItemsControl.Resources>
-                    <DataTemplate DataType="{x:Type vm:Ball}">
+                    <DataTemplate>
                         <Ellipse Fill="Violet" Stroke="LightBlue" StrokeThickness="1" Width="30" Height="30"/>
                     </DataTemplate>
                 </ItemsControl.Resources>
