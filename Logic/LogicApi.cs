@@ -60,6 +60,7 @@ namespace Logic
         public LogicApi(int width, int height)
         {
             // tworzenie warstwy danych
+            // DI
             dataLayer = DataAbstractApi.createApi(width, height);
             this.width = width;
             this.height = height;

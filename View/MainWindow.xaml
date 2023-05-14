@@ -3,104 +3,37 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:View"
         xmlns:vm="clr-namespace:ViewModel;assembly=ViewModel"
+        xmlns:local="clr-namespace:View"
         mc:Ignorable="d"
-        Title="TPW" Height="800" Width="800"
-        MinHeight="750" MinWidth="750"
-        Background="LightBlue">
+        Title="MainWindow" Height="800" Width="1000" Background="Green" Foreground="Black" BorderBrush="Black">
+
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
-    <Viewbox Stretch="Fill"
-           Width="700"
-           Height="700">
-
-        <StackPanel Orientation="Vertical">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20*"/>
-                    <ColumnDefinition Width="20*"/>
-                    <ColumnDefinition Width="20*"/>
-                    <ColumnDefinition Width="20*"/>
-                </Grid.ColumnDefinitions>
-
-                <Button Content="-" 
-                    Command="{Binding RemoveBallButtonClick}"
-                    FontSize="20" 
-                    
-                    Foreground="White"
-                    HorizontalAlignment="Left" 
-                    Grid.Column="1" 
-                    VerticalAlignment="Center" 
-                    Background="Blue" 
-                    Height="30" 
-                    Width="100"
-                    BorderBrush="Black" 
-                        Grid.ColumnSpan="2" Margin="150,0,0,0"/>
-
-                <Button Content="+" 
-                    Command="{Binding AddBallButtonClick}"
-                    FontSize="14" 
-                     
-                    Foreground="White"
-                    HorizontalAlignment="Center" 
-                    Grid.Column="0" 
-                    Background="Blue" 
-                    Width="100"
-                    BorderBrush="Black" FontFamily="Segoe Print"/>
-
-                <TextBox HorizontalAlignment="Left" 
-                     BorderBrush="Black"
-                     Grid.Column="1"
-                     TextAlignment="Center"
-                     FontSize="24"
-                     TextWrapping="Wrap" 
-                     Text="{Binding BallAmountText}" 
-                     VerticalAlignment="Center" 
-                     Width="100"
-                     Height="30"
-                     Background="DarkCyan"
-                     Foreground="White"
-                     FontFamily="Leelawadee"
-                     />
-
-                <Button Content="Play" 
-                    Command="{Binding CreateBallsButtonClick}"
-                    FontSize="15" 
-
-                    Foreground="White"
-                    HorizontalAlignment="Left" 
-                
-                    Grid.Column="2" 
-                    Background="Green" 
-                    Width="200"
-                    BorderBrush="Black" Grid.ColumnSpan="2" Margin="159,0,0,0"/>
 
 
-            </Grid>
-            <Canvas x:Name="canvasArea" Width="800" Height="800" Background="LightBlue">
-                <Rectangle Fill="Transparent" Stroke="Green" StrokeThickness="3" Width="780" Height="780" Margin="10"/>
-            </Canvas>
-
-            <ItemsControl x:Name="ic" ItemsSource="{Binding Items}">
-                <ItemsControl.Resources>
+    <Grid>
+        <Canvas Width="{Binding Width}" Height="{Binding Height}" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#4ea1f5">
+            <ItemsControl Name="Balls" ItemsSource="{Binding Balls}">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Fill="Violet" Stroke="LightBlue" StrokeThickness="1" Width="30" Height="30"/>
+                        <Canvas>
+                            <Ellipse Stroke="Black" Fill="Red"  Width="{Binding ballSize}" Height="{Binding ballSize}" Canvas.Left="{Binding ballX}" Canvas.Top="{Binding ballY}"/>
+                        </Canvas>
                     </DataTemplate>
-                </ItemsControl.Resources>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="{x:Type ContentPresenter}">
-                        <Setter Property="Canvas.Left" Value="{Binding XPos}"/>
-                        <Setter Property="Canvas.Bottom" Value="{Binding YPos}"/>
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
+                </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <Border BorderBrush="Black" BorderThickness="5,5,5,5" Height="{Binding Height}" Width="{Binding Width}" HorizontalAlignment="Center" VerticalAlignment="Top">
+            </Border>
+        </Canvas>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <Button Content="START" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="40" Width="200" Command="{Binding runCommand}" IsEnabled="{Binding isRunEnabled}" />
+            <Button x:Name="StopButton" Content="STOP" FontSize="40" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="200" Command="{Binding stopCommand}" IsEnabled="{Binding isStopEnabled}" />
+            <StackPanel Orientation="Vertical">
+                <TextBox Margin="10,0,0,0" TextWrapping="Wrap" Text="{Binding ballValue}" Width="100" Height="30" TextAlignment="Center" FontSize="20px" BorderBrush="#FF119A33" BorderThickness="3,3,3,3" />
+                <Button x:Name="AddButton" Width="100" Height="30" Content="ADD" FontSize="20" Command="{Binding addCommand}" IsEnabled="{Binding isAddEnabled}" />
+            </StackPanel>
         </StackPanel>
-    </Viewbox>
+    </Grid>
 </Window>
