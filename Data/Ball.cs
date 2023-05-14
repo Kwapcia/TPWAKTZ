@@ -43,7 +43,7 @@ namespace Data
 
         public Ball(int indentyfikator, int size, double x, double y,double newX,double newY,double weight)
         {
-                id = identyfikator;
+                id = indentyfikator;
                 this.size = size;
                 this.x = x;
                 this.y = y;

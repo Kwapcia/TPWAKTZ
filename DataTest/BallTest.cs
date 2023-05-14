@@ -12,7 +12,7 @@ namespace DataTest
         public void moveTest()
         {
             Api = DataAbstractApi.createApi(800, 600);
-            Api.createBallsList(1)'
+            Api.createBallsList(1);
             double x = Api.getBall(0).ballX;
             double y = Api.getBall(0).ballY;
             Api.getBall(0).ballNewX = 5;

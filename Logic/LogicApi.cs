@@ -22,7 +22,7 @@ namespace Logic
 
         public static LogicAbstractApi createApi (int width,int height)
         {
-            return new LogicAbstractApi(width,height);
+            return new LogicApi(width,height);
         }
     }
 
@@ -125,13 +125,13 @@ namespace Logic
             return distance(a, b) <= (a.ballSize / 2 + b.ballSize / 2);
         }
 
-        internal double distance(IBall a,IBall b)
+        internal double distance(IBall a, IBall b)
         {
             double x1 = a.ballX + a.ballSize / 2 + a.ballNewX;
-            double y1 = a.ballY + a.ballSize/2+a.ballNewY;
-            double x2=b.ballX+b.ballSize/2+b.ballNewX;
-            double y2= b.ballY+b.ballSize/2+b.ballNewY;
-            return Math.Sqrt((Math.Pow(x1-x2,2)+Math.Pow(y1-y2,2)));
+            double y1 = a.ballY + a.ballSize / 2 + a.ballNewY;
+            double x2 = b.ballX + b.ballSize / 2 + b.ballNewY;
+            double y2 = b.ballY + b.ballSize / 2 + b.ballNewY;
+            return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 
         public override IList createBalls(int count)
