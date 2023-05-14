@@ -7,48 +7,81 @@ using System.ComponentModel;
 
 namespace Logic
 {
+    // abstrakcyjna klasa API logiki
     public abstract class LogicAbstractApi
     {
+        // właściwość abstrakcyjna zwracająca liczbę kulek
         public abstract int getAmount { get; }
+
+        // metoda abstrakcyjna tworząca kuleki
         public abstract IList createBalls(int count);
+
+        // metoda abstrakcyjna rozpoczynająca ruch kulek
         public abstract void start();
-        public abstract void stop();  
+
+        // metoda abstrakcyjna zatrzymująca ruch kulek
+        public abstract void stop();
+
+        // właściwość abstrakcyjna określająca szerokość planszy
         public abstract int width { get; set; }
+
+        // właściwość abstrakcyjna określająca wysokość planszy
         public abstract int height { get; set; }
+
+        // metoda abstrakcyjna zwracająca kulkę o określonym indeksie
         public abstract IBall getBall(int index);
+
+        // metoda abstrakcyjna wywoływana po kolizji kulki z ścianą
         public abstract void collisionWithWall(IBall ball);
+
+        // metoda abstrakcyjna wywoływana po odbiciu kulek od siebie
         public abstract void bounce(IBall ball);
+
+        // metoda abstrakcyjna wywoływana po zmianie pozycji kuli
         public abstract void changeBallPosition(object sender, PropertyChangedEventArgs args);
 
-        public static LogicAbstractApi createApi (int width,int height)
+        // metoda statyczna tworząca nowe API logiki
+        public static LogicAbstractApi createApi(int width, int height)
         {
-            return new LogicApi(width,height);
+            return new LogicApi(width, height);
         }
     }
 
+    // klasa implementująca API logiki
     internal class LogicApi : LogicAbstractApi
     {
+        // warstwa danych
         private readonly DataAbstractApi dataLayer;
+
+        // obiekt Mutex służący do synchronizacji dostępu do danych
         private readonly Mutex mutex = new Mutex();
 
-        public LogicApi(int width,int height)
+        // konstruktor klasy LogicApi
+        public LogicApi(int width, int height)
         {
-            dataLayer = DataAbstractApi.createApi(width,height);
+            // tworzenie warstwy danych
+            dataLayer = DataAbstractApi.createApi(width, height);
             this.width = width;
             this.height = height;
         }
 
+        // właściwość określająca szerokość planszy
         public override int width { get; set; }
+
+        // właściwość określająca wysokość planszy
         public override int height { get; set; }
 
+        // metoda rozpoczynająca ruch kulek
         public override void start()
         {
-            for (int i = 0; i< dataLayer.getAmount; i++)
+            for (int i = 0; i < dataLayer.getAmount; i++)
             {
+                // tworzenie zadania ruchu dla każdej kulki
                 dataLayer.getBall(i).ballCreateMovementTask(30);
             }
         }
 
+        // Metoda stop zatrzymuje ruch wszystkich piłek w grze
         public override void stop()
         {
             for (int i = 0; i < dataLayer.getAmount; i++ )
@@ -57,6 +90,7 @@ namespace Logic
             }
         }
 
+        // Metoda collisionWithWall odpowiada za detekcję kolizji piłek z krawędziami planszy
         public override void collisionWithWall(IBall ball)
         {
             double diameter = ball.ballSize;
@@ -84,6 +118,8 @@ namespace Logic
                 ball.ballNewY = -ball.ballNewY;
             }
         }
+
+        // Metoda bounce odpowiada za detekcję kolizji między piłkami i zmianę ich kierunku i prędkości
         public override void bounce(IBall ball)
         {
             for(int i=0;i<dataLayer.getAmount;i++)
@@ -116,6 +152,7 @@ namespace Logic
             }
         }
 
+        // Metoda collision służy do sprawdzania, czy dwie piłki nachodzą na siebie
         internal bool collision (IBall a,IBall b)
         {
             if(a==null || b == null)
@@ -125,6 +162,7 @@ namespace Logic
             return distance(a, b) <= (a.ballSize / 2 + b.ballSize / 2);
         }
 
+        // Metoda distance służy do obliczania odległości między środkami dwóch piłek
         internal double distance(IBall a, IBall b)
         {
             double x1 = a.ballX + a.ballSize / 2 + a.ballNewX;
@@ -134,9 +172,13 @@ namespace Logic
             return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 
+
+        // tworzy określoną liczbę kulek i dodaje je do listy kul znajdującej się w obiekcie klasy DataLayer
         public override IList createBalls(int count)
         {
             int previousCount = dataLayer.getAmount;
+            // dla każdej nowo utworzonej kuli, funkcja podłącza metodę changeBallPosition do zdarzenia PropertyChanged,
+            // co umożliwia automatyczne przemieszczanie kuli w czasie rzeczywistym.
             IList temp = dataLayer.createBallsList(count);
             for ( int i = 0; i < dataLayer.getAmount - previousCount; i++ )
             {
@@ -145,13 +187,19 @@ namespace Logic
             return temp;
         }
 
+
+        // zwraca ilość kul znajdujących się na liście kul w obiekcie klasy DataLayer
         public override IBall getBall(int index)
         {
             return dataLayer.getBall(index);
         }
 
+        // zwraca ilość kul znajdujących się na liście kul w obiekcie klasy DataLayer
         public override int getAmount { get=>dataLayer.getAmount; }
 
+        //  jest metodą wywoływaną za każdym razem, gdy pozycja kuli zmienia się. Funkcja ta sprawdza,
+        //  czy kula zderza się ze ścianą, a następnie wywołuje metodę bounce, aby sprawdzić, czy kula zderza się z inną kulą.
+        //  Cały proces jest zabezpieczony za pomocą mutex, aby uniknąć kolizji wątków i utrzymać spójność danych.
         public override void changeBallPosition(object sender, PropertyChangedEventArgs args)
         {
             IBall ball = (IBall)sender;
