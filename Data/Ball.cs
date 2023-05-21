@@ -116,27 +116,21 @@ namespace Data
             }
         }
 
+        public void ballStop()
+        {
+            stop = true;
+        }
+
         public float BallPositionX
         {
             get => BallPosition.X;
-            set
-            {
-                BallPosition = new Vector2(value, BallPosition.Y);
-            }
+
         }
 
         public float BallPositionY
         {
             get => BallPosition.Y;
-            set
-            {
-                BallPosition = new Vector2(BallPosition.X, value);
-            }
-        }
 
-        public void ballStop()
-        {
-            stop = true;
         }
     }
 }

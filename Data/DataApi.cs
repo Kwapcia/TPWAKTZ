@@ -55,7 +55,7 @@ namespace Data
                     double newY = random.Next(-10, 10) + random.NextDouble();
                     Vector2 position = new Vector2((float)x, (float)y);
                     Vector2 newPosition = new Vector2((float)newX, (float)newY);
-                    Vector2 velocity = new Vector2((float)newX, (float)newY); // Przykładowa wartość dla velocity
+                    Vector2 velocity = new Vector2(10, 10); // Przykładowa wartość dla velocity
                     Ball ball = new Ball(i + 1 + ballsCount, r, position, newPosition, velocity, weight);
 
                     balls.Add(ball);
