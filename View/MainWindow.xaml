@@ -19,7 +19,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Canvas>
-                            <Ellipse Stroke="Black" Fill="Red"  Width="{Binding ballSize}" Height="{Binding ballSize}" Canvas.Left="{Binding ballX}" Canvas.Top="{Binding ballY}"/>
+                            <Ellipse Stroke="Black" Fill="Red"  Width="{Binding ballSize}" Height="{Binding ballSize}" Canvas.Left="{Binding BallPosition.X}" Canvas.Top="{Binding BallPosition.Y}"/>
                         </Canvas>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

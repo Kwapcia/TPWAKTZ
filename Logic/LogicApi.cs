@@ -1,6 +1,7 @@
 ﻿using Data;
 using System.Collections;
 using System.ComponentModel;
+using System.Numerics;
 
 namespace Logic
 {
@@ -91,29 +92,25 @@ namespace Logic
         // Metoda collisionWithWall odpowiada za detekcję kolizji piłek z krawędziami planszy
         public override void collisionWithWall(IBall ball)
         {
-            double diameter = ball.ballSize;
+            double diameter = ball.BallSize;
             double right = width - diameter;
             double down = height - diameter;
 
-            if (ball.ballX <= 0)
+            if (ball.BallPosition.X <= 0)
             {
-                ball.ballX = -ball.ballX;
-                ball.ballNewX = -ball.ballNewX;
+                ball.Velocity = new Vector2(-ball.Velocity.X, ball.Velocity.Y);
             }
-            else if (ball.ballX >= right)
+            else if (ball.BallPosition.X >= right)
             {
-                ball.ballX = right - (ball.ballX - right);
-                ball.ballNewX = -ball.ballNewX;
+                ball.Velocity = new Vector2(-ball.Velocity.X, ball.Velocity.Y);
             }
-            if (ball.ballY <= 0)
+            if (ball.BallPosition.Y <= 0)
             {
-                ball.ballY = -ball.ballY;
-                ball.ballNewY = -ball.ballNewY;
+                ball.Velocity = new Vector2(ball.Velocity.X, -ball.Velocity.Y);
             }
-            else if (ball.ballY >= down)
+            else if (ball.BallPosition.Y >= down)
             {
-                ball.ballY = down - (ball.ballY - down);
-                ball.ballNewY = -ball.ballNewY;
+                ball.Velocity = new Vector2(ball.Velocity.X, -ball.Velocity.Y);
             }
         }
 
@@ -123,28 +120,24 @@ namespace Logic
             for (int i = 0; i < dataLayer.getAmount; i++)
             {
                 IBall secondBall = dataLayer.getBall(i);
-                if (ball.ballId == secondBall.ballId)
+                if (ball.BallId == secondBall.BallId)
                 {
                     continue;
                 }
                 if (collision(ball, secondBall))
                 {
-                    double m1 = ball.ballWeight;
-                    double m2 = secondBall.ballWeight;
-                    double v1x = ball.ballNewX;
-                    double v1y = ball.ballNewY;
-                    double v2x = secondBall.ballNewX;
-                    double v2y = secondBall.ballNewY;
+                    double m1 = ball.BallWeight;
+                    double m2 = secondBall.BallWeight;
+                    Vector2 v1 = ball.Velocity;
+                    Vector2 v2 = secondBall.Velocity;
 
-                    double u1x = (m1 - m2) * v1x / (m1 + m2) + (2 * m2) * v2x / (m1 + m2);
-                    double u1y = (m1 - m2) * v1y / (m1 + m2) + (2 * m2) * v2y / (m1 + m2);
-                    double u2x = 2 * m1 * v1x / (m1 + m2) + (m2 - m1) * v2x / (m1 + m2);
-                    double u2y = 2 * m1 * v1y / (m1 + m2) + (m2 - m1) * v2y / (m1 + m2);
+                    double u1x = (m1 - m2) * v1.X / (m1 + m2) + (2 * m2) * v2.X / (m1 + m2);
+                    double u1y = (m1 - m2) * v1.Y / (m1 + m2) + (2 * m2) * v2.Y / (m1 + m2);
+                    double u2x = 2 * m1 * v1.X / (m1 + m2) + (m2 - m1) * v2.X / (m1 + m2);
+                    double u2y = 2 * m1 * v1.Y / (m1 + m2) + (m2 - m1) * v2.Y / (m1 + m2);
 
-                    ball.ballNewX = u1x;
-                    ball.ballNewY = u1y;
-                    secondBall.ballNewX = u2x;
-                    secondBall.ballNewY = u2y;
+                    ball.Velocity = new Vector2((float)u1x, (float)u1y);
+                    secondBall.Velocity = new Vector2((float)u2x, (float)u2y);
                     return;
                 }
             }
@@ -157,16 +150,16 @@ namespace Logic
             {
                 return false;
             }
-            return distance(a, b) <= (a.ballSize / 2 + b.ballSize / 2);
+            return distance(a, b) <= (a.BallSize / 2 + b.BallSize / 2);
         }
 
         // Metoda distance służy do obliczania odległości między środkami dwóch piłek
         internal double distance(IBall a, IBall b)
         {
-            double x1 = a.ballX + a.ballSize / 2 + a.ballNewX;
-            double y1 = a.ballY + a.ballSize / 2 + a.ballNewY;
-            double x2 = b.ballX + b.ballSize / 2 + b.ballNewY;
-            double y2 = b.ballY + b.ballSize / 2 + b.ballNewY;
+            double x1 = a.BallPosition.X + a.BallSize / 2 + a.BallNewPosition.X;
+            double y1 = a.BallPosition.Y + a.BallSize / 2 + a.BallNewPosition.Y;
+            double x2 = b.BallPosition.X + b.BallSize / 2 + a.BallNewPosition.Y;
+            double y2 = b.BallPosition.Y + b.BallSize / 2 + a.BallNewPosition.Y;
             return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 

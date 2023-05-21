@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
+using System.Numerics;
 
 namespace Data
 {
@@ -52,11 +53,13 @@ namespace Data
                     double y = random.Next(r, height - r);
                     double newX = random.Next(-10, 10) + random.NextDouble();
                     double newY = random.Next(-10, 10) + random.NextDouble();
-                    Ball ball = new Ball(i + 1 + ballsCount, r, x, y, newX, newY, weight);
+                    Vector2 position = new Vector2((float)x, (float)y);
+                    Vector2 newPosition = new Vector2((float)newX, (float)newY);
+                    Vector2 velocity = new Vector2((float)newX, (float)newY); // Przykładowa wartość dla velocity
+                    Ball ball = new Ball(i + 1 + ballsCount, r, position, newPosition, velocity, weight);
 
                     balls.Add(ball);
                     mutex.ReleaseMutex();
-
                 }
             }
             if (count < 0)
@@ -68,12 +71,12 @@ namespace Data
                         mutex.WaitOne();
                         balls.Remove(balls[balls.Count - 1]);
                         mutex.ReleaseMutex();
-                    };
+                    }
                 }
             }
             return balls;
-
         }
+
 
         public override int getAmount { get => balls.Count; }
 

@@ -1,119 +1,92 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Numerics;
 
 namespace Data
 {
-
     public interface IBall : INotifyPropertyChanged
     {
-        int ballId { get; }
-        int ballSize { get; }
-        double ballWeight { get; }
-        double ballX { get; set; }
-        double ballY { get; set; }
-        double ballNewX { get; set; }
-        double ballNewY { get; set; }
+        int BallId { get; }
+        int BallSize { get; }
+        double BallWeight { get; }
+
+        Vector2 BallPosition { get; set; }
+        Vector2 BallNewPosition { get; set; }
+        Vector2 Velocity { get; set; }
 
         void ballMove();
         void ballCreateMovementTask(int interval);
         void ballStop();
     }
-    // Klasa Ball dziedziczy po klasie abstrakcyjnej DataApi i implementuje
-    // metody abstrakcyjne zdefiniowane w klasie bazowej
+
     internal class Ball : IBall
     {
-        private readonly int size;
+        private Vector2 position;
+        private Vector2 newPosition;
+        private Vector2 velocity;
         private readonly int id;
-        private double x;
-        private double y;
-        private double newX;
-        private double newY;
+        private readonly int size;
         private readonly double weight;
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Task task;
         private bool stop = false;
 
-
-
-        public Ball(int indentyfikator, int size, double x, double y, double newX, double newY, double weight)
+        public Ball(int id, int size, Vector2 position, Vector2 newPosition, Vector2 velocity, double weight)
         {
-            id = indentyfikator;
+            this.id = id;
             this.size = size;
-            this.x = x;
-            this.y = y;
-            this.newX = newX;
-            this.newY = newY;
+            this.position = position;
+            this.newPosition = newPosition;
+            this.velocity = velocity;
             this.weight = weight;
         }
 
-        public int ballId { get => id; }
+        public int BallId => id;
+        public int BallSize => size;
+        public double BallWeight => weight;
 
-        public int ballSize { get => size; }
-
-        public double ballNewX
+        public Vector2 BallPosition
         {
-            get => newX;
+            get => position;
             set
             {
-                if (value.Equals(newX))
-                {
+                if (value.Equals(position))
                     return;
-                }
 
-                newX = value;
-            }
-        }
-
-        public double ballNewY
-        {
-            get => newY;
-            set
-            {
-                if (value.Equals(newY))
-                {
-                    return;
-                }
-
-                newY = value;
-            }
-        }
-
-        public double ballX
-        {
-            get => x;
-            set
-            {
-                if (value.Equals(x))
-                {
-                    return;
-                }
-
-                x = value;
+                position = value;
                 RaisePropertyChanged();
             }
         }
-        public double ballY
+
+        public Vector2 BallNewPosition
         {
-            get => y;
+            get => newPosition;
             set
             {
-                if (value.Equals(y))
-                {
+                if (value.Equals(newPosition))
                     return;
-                }
 
-                y = value;
-                RaisePropertyChanged();
+                newPosition = value;
             }
         }
+
+        public Vector2 Velocity
+        {
+            get => velocity;
+            set
+            {
+                if (value.Equals(velocity))
+                    return;
+
+                velocity = value;
+            }
+        }
+
         public void ballMove()
         {
-            ballX += ballNewX;
-            ballY += ballNewY;
+            BallPosition += Velocity;
         }
-
-        public double ballWeight { get => weight; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -134,10 +107,10 @@ namespace Data
             {
                 stopwatch.Reset();
                 stopwatch.Start();
+
                 if (!stop)
-                {
                     ballMove();
-                }
+
                 stopwatch.Stop();
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }

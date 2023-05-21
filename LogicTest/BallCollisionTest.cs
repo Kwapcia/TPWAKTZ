@@ -1,5 +1,6 @@
 using Logic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Numerics;
 
 namespace LogicTest
 {
@@ -14,22 +15,15 @@ namespace LogicTest
             Api = LogicAbstractApi.createApi(800, 600);
             Api.createBalls(2);
 
-            Api.getBall(0).ballNewX = 5;
-            Api.getBall(0).ballNewY = 5;
-            Api.getBall(1).ballNewX = -3;
-            Api.getBall(1).ballNewY = -3;
-
-            Api.getBall(0).ballX = 20;
-            Api.getBall(1).ballX = 30;
-            Api.getBall(0).ballY = 20;
-            Api.getBall(1).ballY = 30;
+            Api.getBall(0).BallPosition = new Vector2(20, 20);
+            Api.getBall(1).BallPosition = new Vector2(30, 30);
             Api.getBall(0).ballMove();
             Api.getBall(1).ballMove();
 
-            Assert.AreNotEqual(-3, Api.getBall(1).ballNewX);
-            Assert.AreNotEqual(-3, Api.getBall(1).ballNewY);
-            Assert.AreNotEqual(5, Api.getBall(0).ballNewX);
-            Assert.AreNotEqual(5, Api.getBall(0).ballNewY);
+            Assert.AreNotEqual(-3, Api.getBall(1).BallPosition.X);
+            Assert.AreNotEqual(-3, Api.getBall(1).BallPosition.Y);
+            Assert.AreNotEqual(5, Api.getBall(0).BallPosition.X);
+            Assert.AreNotEqual(5, Api.getBall(0).BallPosition.Y);
         }
 
         [TestMethod]
@@ -37,18 +31,22 @@ namespace LogicTest
         {
             Api = LogicAbstractApi.createApi(800, 600);
             Api.createBalls(1);
-            Api.getBall(0).ballNewX = 5;
-            Api.getBall(0).ballX = 790;
-            Assert.AreNotEqual(5, Api.getBall(0).ballNewX);
-            Api.getBall(0).ballNewX = -3;
-            Api.getBall(0).ballX = -3;
-            Assert.AreNotEqual(-3, Api.getBall(0).ballNewX);
-            Api.getBall(0).ballNewY = -7;
-            Api.getBall(0).ballY = -2;
-            Assert.AreNotEqual(-7, Api.getBall(0).ballNewY);
-            Api.getBall(0).ballNewY = 7;
-            Api.getBall(0).ballY = 607;
-            Assert.AreNotEqual(7, Api.getBall(0).ballNewY);
+            Api.getBall(0).BallPosition = new Vector2(790, 0);
+            Api.getBall(0).ballMove();
+            Assert.AreNotEqual(5, Api.getBall(0).BallPosition.X);
+
+            Api.getBall(0).BallPosition = new Vector2(-3, 0);
+            Api.getBall(0).ballMove();
+            Assert.AreNotEqual(-3, Api.getBall(0).BallPosition.X);
+
+            Api.getBall(0).BallPosition = new Vector2(0, -2);
+            Api.getBall(0).ballMove();
+            Assert.AreNotEqual(-7, Api.getBall(0).BallPosition.Y);
+
+            Api.getBall(0).BallPosition = new Vector2(0, 607);
+            Api.getBall(0).ballMove();
+            Assert.AreNotEqual(7, Api.getBall(0).BallPosition.Y);
         }
+
     }
 }
