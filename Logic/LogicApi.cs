@@ -1,203 +1,201 @@
 ﻿using Data;
+using System;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Numerics;
 
 namespace Logic
 {
-    // abstrakcyjna klasa API logiki
     public abstract class LogicAbstractApi
     {
-        // właściwość abstrakcyjna zwracająca liczbę kulek
-        public abstract int getAmount { get; }
-
-        // metoda abstrakcyjna tworząca kuleki
         public abstract IList createBalls(int count);
-
-        // metoda abstrakcyjna rozpoczynająca ruch kulek
+        public abstract IList deleteBalls(int count);
         public abstract void start();
-
-        // metoda abstrakcyjna zatrzymująca ruch kulek
         public abstract void stop();
-
-        // właściwość abstrakcyjna określająca szerokość planszy
-        public abstract int width { get; set; }
-
-        // właściwość abstrakcyjna określająca wysokość planszy
-        public abstract int height { get; set; }
-
-        // metoda abstrakcyjna zwracająca kulkę o określonym indeksie
-        public abstract IBall getBall(int index);
-
-        // metoda abstrakcyjna wywoływana po kolizji kulki z ścianą
-        public abstract void collisionWithWall(IBall ball);
-
-        // metoda abstrakcyjna wywoływana po odbiciu kulek od siebie
-        public abstract void bounce(IBall ball);
-
-        // metoda abstrakcyjna wywoływana po zmianie pozycji kuli
-        public abstract void changeBallPosition(object sender, PropertyChangedEventArgs args);
-
-        // metoda statyczna tworząca nowe API logiki
+        public abstract int width { get; }
+        public abstract int height { get; }
         public static LogicAbstractApi createApi(int width, int height)
         {
             return new LogicApi(width, height);
         }
     }
-
-    // klasa implementująca API logiki
     internal class LogicApi : LogicAbstractApi
     {
-        // warstwa danych
         private readonly DataAbstractApi dataLayer;
-
-        // obiekt Mutex służący do synchronizacji dostępu do danych
-        private readonly Mutex mutex = new Mutex();
-
-        // konstruktor klasy LogicApi
+        private ObservableCollection<IBall> balls { get; }
+        private readonly ConcurrentQueue<IBall> queue;
         public LogicApi(int width, int height)
         {
-            // tworzenie warstwy danych
-            // DI
             dataLayer = DataAbstractApi.createApi(width, height);
             this.width = width;
             this.height = height;
+            balls = new ObservableCollection<IBall>();
+            queue = new ConcurrentQueue<IBall>();
         }
-
-        // właściwość określająca szerokość planszy
-        public override int width { get; set; }
-
-        // właściwość określająca wysokość planszy
-        public override int height { get; set; }
-
-        // metoda rozpoczynająca ruch kulek
+        public override int width { get; }
+        public override int height { get; }
         public override void start()
         {
-            for (int i = 0; i < dataLayer.getAmount; i++)
+            for (int i = 0; i < balls.Count; i++)
             {
-                // tworzenie zadania ruchu dla każdej kulki
-                dataLayer.getBall(i).ballCreateMovementTask(30);
+                balls[i].PropertyChanged += ballPositionChanged;
+                balls[i].ballCreateMovementTask(30, queue);
             }
+            dataLayer.createLoggingTask(queue);
         }
 
-        // Metoda stop zatrzymuje ruch wszystkich piłek w grze
         public override void stop()
         {
-            for (int i = 0; i < dataLayer.getAmount; i++)
+            for (int i = 0; i < balls.Count; i++)
             {
-                dataLayer.getBall(i).ballStop();
+                balls[i].stopBall();
+                balls[i].PropertyChanged -= ballPositionChanged;
             }
         }
-
-        // Metoda collisionWithWall odpowiada za detekcję kolizji piłek z krawędziami planszy
-        public override void collisionWithWall(IBall ball)
+        public override IList createBalls(int count)
         {
-            double diameter = ball.BallSize;
+            int liczba = balls.Count;
+            for (int i = liczba; i < liczba + count; i++)
+            {
+                bool contain = true;
+                bool licz;
+                while (contain)
+                {
+                    balls.Add(dataLayer.createBall(i + 1));
+                    licz = false;
+                    for (int j = 0; j < i; j++)
+                    {
+                        if (balls[i].ballPosition.X <= balls[j].ballPosition.X + balls[j].ballSize && balls[i].ballPosition.X + balls[i].ballSize >= balls[j].ballPosition.X)
+                        {
+                            if (balls[i].ballPosition.Y <= balls[j].ballPosition.Y + balls[j].ballSize && balls[i].ballPosition.Y + balls[i].ballSize >= balls[j].ballPosition.Y)
+                            {
+                                licz = true;
+                                balls.Remove(balls[i]);
+                                break;
+                            }
+                        }
+                    }
+                    if (!licz)
+                    {
+                        contain = false;
+                    }
+                }
+            }
+            return balls;
+        }
+
+
+        public override IList deleteBalls(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (balls.Count > 0)
+                {
+                    balls.Remove(balls[balls.Count - 1]);
+                };
+            }
+            return balls;
+        }
+        internal void wallCollision(IBall ball)
+        {
+            double diameter = ball.ballSize;
             double right = width - diameter;
             double down = height - diameter;
-
-            if (ball.BallPosition.X <= 0)
+            if (ball.ballPosition.X <= 5)
             {
-                ball.Velocity = new Vector2(-ball.Velocity.X, ball.Velocity.Y);
+                if (ball.ballVelocity.X <= 0)
+                {
+                    ball.ballChangeSpeed(new Vector2(-ball.ballVelocity.X, ball.ballVelocity.Y));
+                }
             }
-            else if (ball.BallPosition.X >= right)
+            else if (ball.ballPosition.X >= right - 5)
             {
-                ball.Velocity = new Vector2(-ball.Velocity.X, ball.Velocity.Y);
+                if (ball.ballVelocity.X > 0)
+                {
+                    ball.ballChangeSpeed(new Vector2(-ball.ballVelocity.X, ball.ballVelocity.Y));
+                }
             }
-            if (ball.BallPosition.Y <= 0)
+            if (ball.ballPosition.Y <= 5)
             {
-                ball.Velocity = new Vector2(ball.Velocity.X, -ball.Velocity.Y);
+                if (ball.ballVelocity.Y <= 0)
+                {
+                    ball.ballChangeSpeed(new Vector2(ball.ballVelocity.X, -ball.ballVelocity.Y));
+                }
             }
-            else if (ball.BallPosition.Y >= down)
+            else if (ball.ballPosition.Y >= down - 5)
             {
-                ball.Velocity = new Vector2(ball.Velocity.X, -ball.Velocity.Y);
+                if (ball.ballVelocity.Y > 0)
+                {
+                    ball.ballChangeSpeed(new Vector2(ball.ballVelocity.X, -ball.ballVelocity.Y));
+                }
             }
         }
 
-        // Metoda bounce odpowiada za detekcję kolizji między piłkami i zmianę ich kierunku i prędkości
-        public override void bounce(IBall ball)
+
+        internal void ballBounce(IBall ball)
         {
-            for (int i = 0; i < dataLayer.getAmount; i++)
+            lock (ball)
             {
-                IBall secondBall = dataLayer.getBall(i);
-                if (ball.BallId == secondBall.BallId)
+                for (int i = 0; i < balls.Count; i++)
                 {
-                    continue;
-                }
-                if (collision(ball, secondBall))
-                {
-                    double m1 = ball.BallWeight;
-                    double m2 = secondBall.BallWeight;
-                    Vector2 v1 = ball.Velocity;
-                    Vector2 v2 = secondBall.Velocity;
+                    IBall secondBall = balls[i];
+                    if (ball.ballID == secondBall.ballID)
+                    {
+                        continue;
+                    }
+                    lock (secondBall)
+                    {
+                        if (collision(ball, secondBall))
+                        {
+                            Vector2 relativePosition = ball.ballPosition - secondBall.ballPosition;
+                            Vector2 relativeVelocity = ball.ballVelocity - secondBall.ballVelocity;
 
-                    double u1x = (m1 - m2) * v1.X / (m1 + m2) + (2 * m2) * v2.X / (m1 + m2);
-                    double u1y = (m1 - m2) * v1.Y / (m1 + m2) + (2 * m2) * v2.Y / (m1 + m2);
-                    double u2x = 2 * m1 * v1.X / (m1 + m2) + (m2 - m1) * v2.X / (m1 + m2);
-                    double u2y = 2 * m1 * v1.Y / (m1 + m2) + (m2 - m1) * v2.Y / (m1 + m2);
+                            if (Vector2.Dot(relativePosition, relativeVelocity) > 0)
+                            {
+                                return;
+                            }
 
-                    ball.Velocity = new Vector2((float)u1x, (float)u1y);
-                    secondBall.Velocity = new Vector2((float)u2x, (float)u2y);
-                    return;
+                            double m1 = ball.ballWeight;
+                            Vector2 v1 = ball.ballVelocity;
+
+                            double m2 = secondBall.ballWeight;
+                            Vector2 v2 = secondBall.ballVelocity;
+
+                            Vector2 u1 = Vector2.Multiply((Vector2.Multiply((float)(m1 - m2), v1) + Vector2.Multiply((float)(2 * m2), v2)), (float)(1 / (m1 + m2)));
+                            Vector2 u2 = Vector2.Multiply((Vector2.Multiply((float)(2 * m1), v1) + Vector2.Multiply((float)(m2 - m1), v2)), (float)(1 / (m1 + m2)));
+
+                            secondBall.ballChangeSpeed(u2);
+                            ball.ballChangeSpeed(u1);
+                        }
+                    }
                 }
             }
         }
 
-        // Metoda collision służy do sprawdzania, czy dwie piłki nachodzą na siebie
+
         internal bool collision(IBall a, IBall b)
         {
             if (a == null || b == null)
             {
                 return false;
             }
-            return distance(a, b) <= (a.BallSize / 2 + b.BallSize / 2);
+            return distance(a, b) <= (a.ballSize / 2 + b.ballSize / 2);
         }
 
-        // Metoda distance służy do obliczania odległości między środkami dwóch piłek
         internal double distance(IBall a, IBall b)
         {
-            double x1 = a.BallPosition.X + a.BallSize / 2 + a.BallNewPosition.X;
-            double y1 = a.BallPosition.Y + a.BallSize / 2 + a.BallNewPosition.Y;
-            double x2 = b.BallPosition.X + b.BallSize / 2 + a.BallNewPosition.Y;
-            double y2 = b.BallPosition.Y + b.BallSize / 2 + a.BallNewPosition.Y;
-            return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
+            Vector2 centerA = a.ballPosition + new Vector2(a.ballSize / 2);
+            Vector2 centerB = b.ballPosition + new Vector2(b.ballSize / 2);
+            return Vector2.Distance(centerA, centerB);
         }
 
-
-        // tworzy określoną liczbę kulek i dodaje je do listy kul znajdującej się w obiekcie klasy DataLayer
-        public override IList createBalls(int count)
-        {
-            int previousCount = dataLayer.getAmount;
-            // dla każdej nowo utworzonej kuli, funkcja podłącza metodę changeBallPosition do zdarzenia PropertyChanged,
-            // co umożliwia automatyczne przemieszczanie kuli w czasie rzeczywistym.
-            IList temp = dataLayer.createBallsList(count);
-            for (int i = 0; i < dataLayer.getAmount - previousCount; i++)
-            {
-                dataLayer.getBall(previousCount + i).PropertyChanged += changeBallPosition;
-            }
-            return temp;
-        }
-
-
-        // zwraca ilość kul znajdujących się na liście kul w obiekcie klasy DataLayer
-        public override IBall getBall(int index)
-        {
-            return dataLayer.getBall(index);
-        }
-
-        // zwraca ilość kul znajdujących się na liście kul w obiekcie klasy DataLayer
-        public override int getAmount { get => dataLayer.getAmount; }
-
-        //  jest metodą wywoływaną za każdym razem, gdy pozycja kuli zmienia się. Funkcja ta sprawdza,
-        //  czy kula zderza się ze ścianą, a następnie wywołuje metodę bounce, aby sprawdzić, czy kula zderza się z inną kulą.
-        //  Cały proces jest zabezpieczony za pomocą mutex, aby uniknąć kolizji wątków i utrzymać spójność danych.
-        public override void changeBallPosition(object sender, PropertyChangedEventArgs args)
+        internal void ballPositionChanged(object sender, PropertyChangedEventArgs args)
         {
             IBall ball = (IBall)sender;
-            mutex.WaitOne();
-            collisionWithWall(ball);
-            bounce(ball);
-            mutex.ReleaseMutex();
+            wallCollision(ball);
+            ballBounce(ball);
         }
     }
 }

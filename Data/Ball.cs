@@ -1,136 +1,108 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Numerics;
 
 namespace Data
 {
     public interface IBall : INotifyPropertyChanged
     {
-        int BallId { get; }
-        int BallSize { get; }
-        double BallWeight { get; }
-
-        Vector2 BallPosition { get; set; }
-        Vector2 BallNewPosition { get; set; }
-        Vector2 Velocity { get; set; }
-
-        void ballMove();
-        void ballCreateMovementTask(int interval);
-        void ballStop();
+        int ballID { get; }
+        int ballSize { get; }
+        double ballWeight { get; }
+        Vector2 ballPosition { get; }
+        Vector2 ballVelocity { get; }
+        void ballChangeSpeed(Vector2 velocity);
+        void moveBall(double time, ConcurrentQueue<IBall> queue);
+        Task ballCreateMovementTask(int interval, ConcurrentQueue<IBall> queue);
+        void saveBall(ConcurrentQueue<IBall> queue);
+        void stopBall();
     }
 
     internal class Ball : IBall
     {
-        private Vector2 position;
-        private Vector2 newPosition;
-        private Vector2 velocity;
-        private readonly int id;
         private readonly int size;
+        private readonly int id;
+        private Vector2 position;
+        private Vector2 velocity;
         private readonly double weight;
-        private readonly Stopwatch stopwatch = new Stopwatch();
-        private Task task;
-        private bool stop = false;
+        private readonly Stopwatch stopwatch;
+        private bool stop;
+        private readonly object locker = new object();
 
-        public Ball(int id, int size, Vector2 position, Vector2 newPosition, Vector2 velocity, double weight)
+        public Ball(int idBall, int size, Vector2 position, Vector2 velocity, double weight)
         {
-            this.id = id;
+            id = idBall;
             this.size = size;
             this.position = position;
-            this.newPosition = newPosition;
             this.velocity = velocity;
             this.weight = weight;
+            stop = false;
+            stopwatch = new Stopwatch();
         }
 
-        public int BallId => id;
-        public int BallSize => size;
-        public double BallWeight => weight;
+        public int ballID { get => id; }
+        public int ballSize { get => size; }
+        public double ballWeight { get => weight; }
+        public Vector2 ballPosition { get => position; }
+        public Vector2 ballVelocity { get => velocity; }
 
-        public Vector2 BallPosition
+        public void ballChangeSpeed(Vector2 newVelocity)
         {
-            get => position;
-            set
+            lock (locker)
             {
-                if (value.Equals(position))
-                    return;
-
-                position = value;
-                RaisePropertyChanged();
+                velocity = newVelocity;
             }
         }
 
-        public Vector2 BallNewPosition
+        public void moveBall(double time, ConcurrentQueue<IBall> queue)
         {
-            get => newPosition;
-            set
+            lock (locker)
             {
-                if (value.Equals(newPosition))
-                    return;
-
-                newPosition = value;
+                position += velocity * (float)time;
+                RaisePropertyChanged(nameof(ballPosition));
+                saveBall(queue);
             }
         }
 
-        public Vector2 Velocity
+        public void saveBall(ConcurrentQueue<IBall> queue)
         {
-            get => velocity;
-            set
-            {
-                if (value.Equals(velocity))
-                    return;
-
-                velocity = value;
-            }
-        }
-
-        public void ballMove()
-        {
-            BallPosition += Velocity;
+            queue.Enqueue(new Ball(ballID, ballSize, ballPosition, ballVelocity, ballWeight));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void ballCreateMovementTask(int interval)
+        public Task ballCreateMovementTask(int interval, ConcurrentQueue<IBall> queue)
         {
             stop = false;
-            task = Run(interval);
+            return Run(interval, queue);
         }
 
-        private async Task Run(int interval)
+        private async Task Run(int interval, ConcurrentQueue<IBall> queue)
         {
             while (!stop)
             {
                 stopwatch.Reset();
                 stopwatch.Start();
-
                 if (!stop)
-                    ballMove();
-
+                {
+                    moveBall((interval - stopwatch.ElapsedMilliseconds) / 16.0, queue);
+                }
                 stopwatch.Stop();
+
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }
         }
 
-        public void ballStop()
+        public void stopBall()
         {
             stop = true;
-        }
-
-        public float BallPositionX
-        {
-            get => BallPosition.X;
-
-        }
-
-        public float BallPositionY
-        {
-            get => BallPosition.Y;
-
         }
     }
 }
