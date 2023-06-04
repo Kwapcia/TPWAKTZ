@@ -8,10 +8,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1000" Background="Green" Foreground="Black" BorderBrush="Black">
 
+    <Window.Resources>
+        <vm:Vector2ToFloatConverter x:Key="Vector2ToFloatConverter" />
+    </Window.Resources>
+
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
-
 
     <Grid>
         <Canvas Width="{Binding DataContext.Width, RelativeSource={RelativeSource AncestorType=Window}}" Height="{Binding DataContext.Height, RelativeSource={RelativeSource AncestorType=Window}}" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#4ea1f5">
@@ -19,7 +22,9 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Canvas>
-                            <Ellipse Stroke="Black" Fill="Red"  Width="{Binding ballSize}" Height="{Binding ballSize}" Canvas.Left="{Binding ballPosition.X}" Canvas.Top="{Binding ballPosition.Y}"/>
+                            <Ellipse Stroke="Black" Fill="Red"  Width="{Binding ballSize}" Height="{Binding ballSize}" 
+                                     Canvas.Left="{Binding ballPosition, Converter={StaticResource Vector2ToFloatConverter}, ConverterParameter=X}" 
+                                     Canvas.Top="{Binding ballPosition, Converter={StaticResource Vector2ToFloatConverter}, ConverterParameter=Y}"/>
                         </Canvas>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
