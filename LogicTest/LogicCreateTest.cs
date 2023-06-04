@@ -7,27 +7,32 @@ namespace LogicTest
     [TestClass]
     public class CreationTest
     {
-        private LogicAbstractApi Api;
+        private LogicAbstractApi LApi;
+
 
         [TestMethod]
         public void testCreateApi()
         {
-            Api = LogicAbstractApi.createApi(800, 600);
-            Assert.IsNotNull(Api);
+            LApi = LogicAbstractApi.createApi(800, 600);
+            Assert.IsNotNull(LApi);
         }
 
         [TestMethod]
-        public void getCount()
+        public void getWidthHeightTest()
         {
-            Api = LogicAbstractApi.createApi(800, 600);
-            Assert.AreEqual(800, Api.width);
-            Assert.AreEqual(600, Api.height);
-            Api.createBalls(5);
-            Assert.AreEqual(5, Api.getAmount);
-            Api.createBalls(-3);
-            Assert.AreEqual(2, Api.getAmount);
-            Api.createBalls(-3);
-            Assert.AreEqual(0, Api.getAmount);
+            LApi = LogicAbstractApi.createApi(800, 600);
+            Assert.AreEqual(800, LApi.width);
+            Assert.AreEqual(600, LApi.height);
+
+        }
+
+        [TestMethod]
+        public void createDeleteTest()
+        {
+            LApi = LogicAbstractApi.createApi(800, 600);
+            Assert.AreEqual(5, LApi.createBalls(5).Count);
+            Assert.AreEqual(2, LApi.deleteBalls(3).Count);
+            Assert.AreEqual(0, LApi.deleteBalls(3).Count);
         }
     }
 }

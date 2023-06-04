@@ -1,48 +1,52 @@
 ﻿using Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Concurrent;
 using System.Numerics;
 
-namespace DataTest
+namespace TestData
 {
+
+
     [TestClass]
     public class BallTest
     {
-        private DataAbstractApi Api;
+        private DataAbstractApi DApi;
+
+        [TestMethod]
+        public void createIBallTest()
+        {
+            DApi = DataAbstractApi.createApi(800, 600);
+            IBall b = DApi.createBall(1);
+            Assert.AreEqual(1, b.ballID);
+
+            Assert.IsTrue(b.ballPosition.X >= b.ballSize);
+            Assert.IsTrue(b.ballPosition.X <= (DApi.width - b.ballSize));
+            Assert.IsTrue(b.ballPosition.Y >= b.ballSize);
+            Assert.IsTrue(b.ballPosition.Y <= (DApi.height - b.ballSize));
+
+            Assert.AreEqual(30, b.ballSize);
+            Assert.IsTrue(b.ballWeight == b.ballSize);
+            Assert.IsTrue(b.ballVelocity.X >= -5 && b.ballVelocity.X <= 6);
+            Assert.IsTrue(b.ballVelocity.Y >= -5 && b.ballVelocity.Y <= 6);
+        }
 
         [TestMethod]
         public void moveTest()
         {
-            Api = DataAbstractApi.createApi(800, 600);
-            Api.createBallsList(1);
-            double x = Api.getBall(0).BallPosition.X;
-            double y = Api.getBall(0).BallPosition.Y;
-            Api.getBall(0).BallNewPosition = new Vector2(5, 5);
-            Api.getBall(0).ballMove();
-            Assert.AreNotEqual(x, Api.getBall(0).BallPosition.X);
-            Assert.AreNotEqual(y, Api.getBall(0).BallPosition.Y);
+            DApi = DataAbstractApi.createApi(800, 600);
+            IBall b = DApi.createBall(1);
+            double x = b.ballPosition.X;
+            double y = b.ballPosition.Y;
+            b.ballChangeSpeed(new Vector2(5, 5));
+            ConcurrentQueue<IBall> queue = new ConcurrentQueue<IBall>();
+            b.moveBall(1, queue);
+            Assert.AreNotEqual(x, b.ballPosition.X);
+            Assert.AreNotEqual(y, b.ballPosition.Y);
+            ;
         }
 
-        [TestMethod]
-        public void setTests()
-        {
-            Api = DataAbstractApi.createApi(800, 600);
-            Api.createBallsList(1);
-            Api.getBall(0).BallPosition = new Vector2(10, 17);
-            Api.getBall(0).BallNewPosition = new Vector2(4, -3);
-            Assert.AreEqual(10, Api.getBall(0).BallPosition.X);
-            Assert.AreEqual(17, Api.getBall(0).BallPosition.Y);
-            Assert.AreEqual(4, Api.getBall(0).BallNewPosition.X);
-            Assert.AreEqual(-3, Api.getBall(0).BallNewPosition.Y);
-        }
 
-        [TestMethod]
-        public void velocityTest()
-        {
-            Api = DataAbstractApi.createApi(800, 600);
-            Api.createBallsList(1);
-            Api.getBall(0).Velocity = new Vector2(2, 3);
-            Assert.AreEqual(2, Api.getBall(0).Velocity.X);
-            Assert.AreEqual(3, Api.getBall(0).Velocity.Y);
-        }
+
+
     }
 }
