@@ -15,9 +15,9 @@ namespace Data
         Vector2 ballPosition { get; }
         Vector2 ballVelocity { get; }
         void ballChangeSpeed(Vector2 velocity);
-        void moveBall(double time, ConcurrentQueue<IBall> queue);
-        Task ballCreateMovementTask(int interval, ConcurrentQueue<IBall> queue);
-        void saveBall(ConcurrentQueue<IBall> queue);
+        void moveBall(double time, ConcurrentQueue<IBall> queue); // Method to move the ball based on the elapsed time
+        Task ballCreateMovementTask(int interval, ConcurrentQueue<IBall> queue); // Method to create a task for continuously moving the ball
+        void saveBall(ConcurrentQueue<IBall> queue); // Method to save the current state of the ball to a queue
         void stopBall();
     }
 
@@ -29,7 +29,7 @@ namespace Data
         private Vector2 velocity;
         private readonly double weight;
         private readonly Stopwatch stopwatch;
-        private bool stop;
+        private bool stop; // Flag to indicate if the ball movement should stop
         private readonly object locker = new object();
 
         public Ball(int idBall, int size, Vector2 position, Vector2 velocity, double weight)
@@ -61,20 +61,25 @@ namespace Data
         {
             lock (locker)
             {
+                // Update the position based on the velocity and elapsed time
                 position += velocity * (float)time;
+                // Notify listeners that the ballPosition property has changed
                 RaisePropertyChanged(nameof(ballPosition));
+                // Save the current state of the ball to the queue
                 saveBall(queue);
             }
         }
 
         public void saveBall(ConcurrentQueue<IBall> queue)
         {
+            // Enqueue a new Ball object with the current state to the queue
             queue.Enqueue(new Ball(ballID, ballSize, ballPosition, ballVelocity, ballWeight));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
         internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
+            // Invoke the PropertyChanged event to notify listeners that a property has changed
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
@@ -90,18 +95,20 @@ namespace Data
             {
                 stopwatch.Reset();
                 stopwatch.Start();
+                // Move the ball based on the remaining time until the next interval
                 if (!stop)
                 {
                     moveBall((interval - stopwatch.ElapsedMilliseconds) / 16.0, queue);
                 }
                 stopwatch.Stop();
-
+                // Delay the task until the next interval
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }
         }
 
         public void stopBall()
         {
+            // Set the stop flag to true, indicating that the ball movement should stop
             stop = true;
         }
     }
