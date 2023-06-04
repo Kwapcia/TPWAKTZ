@@ -13,6 +13,7 @@ namespace ViewModel
         private bool _isStopEnabled = false;
         private bool isStartEnabled = false;
         private bool _isAddEnabled = true;
+        private bool _isDeleteEnabled = false;
         private int size = 0;
         private IList _balls;
 
@@ -20,17 +21,19 @@ namespace ViewModel
 
         public ICommand runCommand { get; set; }
 
-        public ICommand stopCommand
-        { get; set; }
+        public ICommand stopCommand { get; }
+
+        public ICommand DeleteCommand { get; }
 
         public MainWindowViewModel()
         {
             width = 600;
             height = 480;
             modelLayer = ModelAbstractApi.createApi(width, height);
-            stopCommand = new Commands(Stop);
-            addCommand = new Commands(AddBalls);
-            runCommand = new Commands(Start);
+            stopCommand = new RelayCommand(Stop);
+            addCommand = new RelayCommand(AddBalls);
+            runCommand = new RelayCommand(Start);
+            DeleteCommand = new RelayCommand(DeleteBalls);
         }
 
         public bool isStopEnabled
@@ -62,6 +65,20 @@ namespace ViewModel
             set
             {
                 _isAddEnabled = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool isDeleteEnabled
+        {
+            get
+            {
+                return _isDeleteEnabled;
+            }
+            set
+            {
+                _isDeleteEnabled = value;
+
                 RaisePropertyChanged();
             }
         }
@@ -121,12 +138,32 @@ namespace ViewModel
             ballValue = 1;
         }
 
+        private void DeleteBalls()
+        {
+            size -= ballValue;
+            Balls = modelLayer.delete(ballValue);
+            if(size>=0)
+            {
+                isRunEnabled=true;
+                isAddEnabled=true;
+            }
+            if(size<=0)
+            {
+                size=0;
+                isAddEnabled=true;
+                isRunEnabled=false;
+                isDeleteEnabled=false;
+            }
+            ballValue=1;
+        }
+
 
         private void Stop()
         {
             isStopEnabled = false;
             isAddEnabled = true;
             isRunEnabled = true;
+            isDeleteEnabled = true;
             modelLayer.stop();
         }
 
@@ -135,6 +172,7 @@ namespace ViewModel
             isStopEnabled = true;
             isRunEnabled = false;
             isAddEnabled = false;
+             isDeleteEnabled = false;
             modelLayer.startMoving();
         }
 
