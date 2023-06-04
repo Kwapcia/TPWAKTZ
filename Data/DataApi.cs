@@ -58,16 +58,18 @@ namespace Data
             Ball ball = new Ball(count, radius, position, velocity, weight);
             return ball;
         }
-
+        // Stops the logging task
         public override void stopLoggingTask()
         {
             stop = true;
         }
+        // Stops the logging task
         public override Task createLoggingTask(ConcurrentQueue<IBall> logQueue)
         {
             stop = false;
             return callLogger(logQueue);
         }
+        // Deletes the existing log file if it exists and a new session is started
         internal void FileMaker(string filename)
         {
             if (File.Exists(filename) && newSession)
@@ -76,6 +78,7 @@ namespace Data
                 File.Delete(filename);
             }
         }
+        // Deletes the existing log file if it exists and a new session is started
         public override void appendObjectToJsonFile(string filename, string newJsonObject)
         {
             using (StreamWriter sw = new StreamWriter(filename, true))
