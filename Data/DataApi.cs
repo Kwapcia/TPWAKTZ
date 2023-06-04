@@ -115,7 +115,7 @@ namespace Data
                 logQueue.TryDequeue(out IBall logObject);
                 if (logObject != null)
                 {
-                    diagnostics = JsonSerializer.Serialize(logObject);
+                    diagnostics = $"{{\"ballID\":{logObject.ballID},\"ballSize\":{logObject.ballSize},\"ballWeight\":{logObject.ballWeight},\"ballPosition\":{{\"X\":{logObject.ballPosition.X},\"Y\":{logObject.ballPosition.Y}}},\"ballVelocity\":{{\"X\":{logObject.ballVelocity.X},\"Y\":{logObject.ballVelocity.Y}}}}}";
                     date = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss.fff");
                     log = "{" + String.Format("\n\t\"Date\": \"{0}\",\n\t\"Info\":{1}\n", date, diagnostics) + "}";
                     lock (this)
