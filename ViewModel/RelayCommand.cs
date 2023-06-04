@@ -37,10 +37,5 @@ namespace ViewModel
         {
             m_Execute();
         }
-
-        // internal void RaiseCanExecuteChanged()
-        // {
-        //    this.m_CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        //}
     }
 }

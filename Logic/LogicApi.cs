@@ -16,12 +16,13 @@ namespace Logic
         public abstract void stop();
         public abstract int width { get; }
         public abstract int height { get; }
-        // Creates an instance of LogicAbstractApi with the specified width and height
+
         public static LogicAbstractApi createApi(int width, int height)
         {
             return new LogicApi(width, height);
         }
     }
+
     internal class LogicApi : LogicAbstractApi
     {
         private readonly DataAbstractApi dataLayer;
@@ -32,38 +33,42 @@ namespace Logic
             dataLayer = DataAbstractApi.createApi(width, height);
             this.width = width;
             this.height = height;
-            // Initialize the list of balls and the queue
+            // Inicjalizuje listę piłek i kolejkę
             balls = new ObservableCollection<IBall>();
             queue = new ConcurrentQueue<IBall>();
         }
+
         public override int width { get; }
+
         public override int height { get; }
+
         public override void start()
         {
-            // Attach event handlers and start movement tasks for each ball
+            // Tworzy zadanie logowania przy użyciu warstwy danych
             for (int i = 0; i < balls.Count; i++)
             {
                 balls[i].PropertyChanged += ballPositionChanged;
                 balls[i].ballCreateMovementTask(30, queue);
             }
-            // Create a logging task using the data layer
+            // Tworzy zadanie logowania przy użyciu warstwy danych
             dataLayer.createLoggingTask(queue);
         }
 
         public override void stop()
         {
-            // Stop balls and detach event handlers
+           // Zatrzymuje piłki i usuwa obsługę zdarzeń
             for (int i = 0; i < balls.Count; i++)
             {
                 balls[i].stopBall();
                 balls[i].PropertyChanged -= ballPositionChanged;
             }
         }
-        // Creates a specified number of balls, ensuring no collisions with existing balls
+
+        // Tworzy określoną liczbę piłek, zapewniając brak kolizji z istniejącymi piłkami
         public override IList createBalls(int count)
         {
             int liczba = balls.Count;
-            // Create new balls and check for collisions with existing balls
+             // Tworzy nowe piłki i sprawdza kolizje z istniejącymi piłkami
             for (int i = liczba; i < liczba + count; i++)
             {
                 bool contain = true;
@@ -74,10 +79,12 @@ namespace Logic
                     licz = false;
                     for (int j = 0; j < i; j++)
                     {
+                        // Sprawdza kolizję między piłkami
                         if (balls[i].ballPosition.X <= balls[j].ballPosition.X + balls[j].ballSize && balls[i].ballPosition.X + balls[i].ballSize >= balls[j].ballPosition.X)
                         {
                             if (balls[i].ballPosition.Y <= balls[j].ballPosition.Y + balls[j].ballSize && balls[i].ballPosition.Y + balls[i].ballSize >= balls[j].ballPosition.Y)
                             {
+                                // Jeśli występuje kolizja, usuwa nowo utworzoną piłkę
                                 licz = true;
                                 balls.Remove(balls[i]);
                                 break;
@@ -105,13 +112,14 @@ namespace Logic
             }
             return balls;
         }
-        // Handles wall collision for a ball
+
+       // Obsługuje kolizję piłki z ścianami
         internal void wallCollision(IBall ball)
         {
             double diameter = ball.ballSize;
             double right = width - diameter;
             double down = height - diameter;
-            // Check and handle collision with the walls
+            // Sprawdza i obsługuje kolizję z ścianami
             if (ball.ballPosition.X <= 5)
             {
                 if (ball.ballVelocity.X <= 0)
@@ -142,7 +150,7 @@ namespace Logic
             }
         }
 
-        // Handles ball-to-ball collision
+        // Obsługuje odbicie piłki od innych piłek
         internal void ballBounce(IBall ball)
         {
             lock (ball)
@@ -183,7 +191,7 @@ namespace Logic
             }
         }
 
-        // Checks for collision between two balls
+        // Sprawdza kolizję między dwoma piłkami
         internal bool collision(IBall a, IBall b)
         {
             if (a == null || b == null)
@@ -192,14 +200,16 @@ namespace Logic
             }
             return distance(a, b) <= (a.ballSize / 2 + b.ballSize / 2);
         }
-        // Calculates the distance between two balls
+
+        // Oblicza odległość między dwoma piłkami
         internal double distance(IBall a, IBall b)
         {
             Vector2 centerA = a.ballPosition + new Vector2(a.ballSize / 2);
             Vector2 centerB = b.ballPosition + new Vector2(b.ballSize / 2);
             return Vector2.Distance(centerA, centerB);
         }
-        // Event handler for ball position changes
+
+        // Obsługuje zmianę pozycji piłki
         internal void ballPositionChanged(object sender, PropertyChangedEventArgs args)
         {
             IBall ball = (IBall)sender;

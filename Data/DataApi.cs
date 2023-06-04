@@ -11,11 +11,17 @@ namespace Data
     public abstract class DataAbstractApi
     {
         public abstract IBall createBall(int count);
+
         public abstract int width { get; }
+
         public abstract int height { get; }
+
         public abstract void stopLoggingTask();
+
         public abstract Task createLoggingTask(ConcurrentQueue<IBall> logQueue);
+
         public abstract void appendObjectToJsonFile(string filename, string newJsonObject);
+
         public static DataAbstractApi createApi(int width, int height)
         {
             return new DataApi(width, height);
@@ -29,8 +35,11 @@ namespace Data
         private readonly string logPath = "Log.json";
         private bool newSession;
         private bool stop;
+
         public override int width { get; }
+
         public override int height { get; }
+
         public DataApi(int width, int height)
         {
             this.width = width;
@@ -38,6 +47,7 @@ namespace Data
             newSession = true;
             stopwatch = new Stopwatch();
         }
+
         public override IBall createBall(int count)
         {
             int radius = 30;
@@ -58,18 +68,21 @@ namespace Data
             Ball ball = new Ball(count, radius, position, velocity, weight);
             return ball;
         }
-        // Stops the logging task
+
+        // Zatrzymuje zadanie logowania
         public override void stopLoggingTask()
         {
             stop = true;
         }
-        // Stops the logging task
+
+        // Tworzy zadanie logowania z określoną kolejką logów
         public override Task createLoggingTask(ConcurrentQueue<IBall> logQueue)
         {
             stop = false;
             return callLogger(logQueue);
         }
-        // Deletes the existing log file if it exists and a new session is started
+
+        // Usuwa istniejący plik dziennika, jeśli istnieje i rozpoczyna nową sesję
         internal void FileMaker(string filename)
         {
             if (File.Exists(filename) && newSession)
@@ -78,7 +91,8 @@ namespace Data
                 File.Delete(filename);
             }
         }
-        // Deletes the existing log file if it exists and a new session is started
+
+       // Dodaje nowy obiekt JSON do określonego pliku JSON (usuwa jeśli już istniał)
         public override void appendObjectToJsonFile(string filename, string newJsonObject)
         {
             using (StreamWriter sw = new StreamWriter(filename, true))
@@ -105,6 +119,8 @@ namespace Data
                 sw.Write(content);
             }
         }
+
+        // Wywołuje zadanie logowania asynchronicznie
         internal async Task callLogger(ConcurrentQueue<IBall> logQueue)
         {
             FileMaker(logPath);
