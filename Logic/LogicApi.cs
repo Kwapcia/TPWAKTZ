@@ -194,8 +194,12 @@ namespace Logic
         internal void ballPositionChanged(object sender, PropertyChangedEventArgs args)
         {
             IBall ball = (IBall)sender;
-            wallCollision(ball);
-            ballBounce(ball);
+            lock (ball)
+            {
+                wallCollision(ball);
+                ballBounce(ball);
+            }
         }
+
     }
 }

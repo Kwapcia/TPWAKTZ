@@ -11,7 +11,8 @@ namespace Model
         public abstract int width { get; }
         public abstract int height { get; }
         public abstract void startMoving();
-        public abstract IList start(int ballVal);
+        public abstract IList create(int ballVal);
+        public abstract IList delete(int ballVal);
         public abstract void stop();
 
         // statyczna metoda fabryczna do tworzenia obiektów ModelAbstractApi
@@ -51,7 +52,8 @@ namespace Model
         }
 
         // Implementacja metody start z interfejsu ModelAbstractApi
-        public override IList start(int ballVal) => logicLayer.createBalls(ballVal);
+        public override IList create(int ballVal) => logicLayer.createBalls(ballVal);
+        public override IList delete(int ballVal) => logicLayer.deleteBalls(ballVal);
 
     }
 }

@@ -117,9 +117,10 @@ namespace ViewModel
                 size = 0;
                 isRunEnabled = false;
             }
-            Balls = modelLayer.start(ballValue);
+            Balls = modelLayer.create(ballValue);
             ballValue = 1;
         }
+
 
         private void Stop()
         {
