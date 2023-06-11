@@ -1,9 +1,10 @@
 ﻿using Logic;
+using Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LogicTest
 {
-
+    
     [TestClass]
     public class CreationTest
     {

@@ -142,19 +142,19 @@ namespace ViewModel
         {
             size -= ballValue;
             Balls = modelLayer.delete(ballValue);
-            if(size>=0)
+            if (size >= 0)
             {
-                isRunEnabled=true;
-                isAddEnabled=true;
+                isRunEnabled = true;
+                isAddEnabled = true;
             }
-            if(size<=0)
+            if (size <= 0)
             {
-                size=0;
-                isAddEnabled=true;
-                isRunEnabled=false;
-                isDeleteEnabled=false;
+                size = 0;
+                isAddEnabled = true;
+                isRunEnabled = false;
+                isDeleteEnabled = false;
             }
-            ballValue=1;
+            ballValue = 1;
         }
 
 
@@ -172,7 +172,7 @@ namespace ViewModel
             isStopEnabled = true;
             isRunEnabled = false;
             isAddEnabled = false;
-             isDeleteEnabled = false;
+            isDeleteEnabled = false;
             modelLayer.startMoving();
         }
 
@@ -190,5 +190,6 @@ namespace ViewModel
                 RaisePropertyChanged();
             }
         }
+       
     }
 }

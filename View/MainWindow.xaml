@@ -38,7 +38,8 @@
             <StackPanel Orientation="Vertical">
                 <TextBox Margin="10,0,0,0" TextWrapping="Wrap" Text="{Binding ballValue}" Width="100" Height="30" TextAlignment="Center" FontSize="20px" BorderBrush="#FF119A33" BorderThickness="3,3,3,3" />
                 <Button x:Name="AddButton" Width="100" Height="30" Content="ADD" FontSize="20" Command="{Binding addCommand}" IsEnabled="{Binding isAddEnabled}" />
-				<Button x:Name="DeleteButton" Width="100" Height="30" Content ="DELETE" FontSize="20" Command="{Binding DeleteCommand}" IsEnabled="{Binding isDeleteEnabled}"> </Button>
+                <Button x:Name="DeleteButton" Width="100" Height="30" Content ="DELETE" FontSize="20" Command="{Binding DeleteCommand}" IsEnabled="{Binding isDeleteEnabled}"></Button>
+
             </StackPanel>
         </StackPanel>
     </Grid>

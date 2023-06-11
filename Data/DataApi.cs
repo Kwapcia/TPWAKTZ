@@ -122,33 +122,47 @@ namespace Data
 
         // Wywołuje zadanie logowania asynchronicznie
         internal async Task callLogger(ConcurrentQueue<IBall> logQueue)
+{
+    FileMaker(logPath);
+    string diagnostics;
+    string date;
+    string log;
+    ManualResetEvent queueNotEmpty = new ManualResetEvent(false);
+
+    while (!stop)
+    {
+        stopwatch.Reset();
+        stopwatch.Start();
+        IBall logObject;
+
+        if (!logQueue.IsEmpty)
         {
-            FileMaker(logPath);
-            string diagnostics;
-            string date;
-            string log;
-            while (!stop)
+            while (!logQueue.TryDequeue(out logObject))
             {
-                stopwatch.Reset();
-                stopwatch.Start();
-                logQueue.TryDequeue(out IBall logObject);
-                if (logObject != null)
-                {
-                    diagnostics = $"{{\"ballID\":{logObject.ballID},\"ballSize\":{logObject.ballSize},\"ballWeight\":{logObject.ballWeight},\"ballPosition\":{{\"X\":{logObject.ballPosition.X},\"Y\":{logObject.ballPosition.Y}}},\"ballVelocity\":{{\"X\":{logObject.ballVelocity.X},\"Y\":{logObject.ballVelocity.Y}}}}}";
-                    date = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss.fff");
-                    log = "{" + String.Format("\n\t\"Date\": \"{0}\",\n\t\"Info\":{1}\n", date, diagnostics) + "}";
-                    lock (this)
-                    {
-                        File.AppendAllText(logPath, log);
-                    }
-                }
-                else
-                {
-                    return;
-                }
-                stopwatch.Stop();
-                await Task.Delay((int)(stopwatch.ElapsedMilliseconds));
+                // Delay until the logQueue is not empty
+                queueNotEmpty.Reset();
+                queueNotEmpty.WaitOne();
             }
+
+            diagnostics = $"{{\"ballID\":{logObject.ballID},\"ballSize\":{logObject.ballSize},\"ballWeight\":{logObject.ballWeight},\"ballPosition\":{{\"X\":{logObject.ballPosition.X},\"Y\":{logObject.ballPosition.Y}}},\"ballVelocity\":{{\"X\":{logObject.ballVelocity.X},\"Y\":{logObject.ballVelocity.Y}}}}}";
+            date = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss.fff");
+            log = "{" + String.Format("\n\t\"Date\": \"{0}\",\n\t\"Info\":{1}\n", date, diagnostics) + "}";
+
+            lock (this)
+            {
+                File.AppendAllText(logPath, log);
+            }
+
+            stopwatch.Stop();
+            await Task.Delay((int)(stopwatch.ElapsedMilliseconds));
         }
+        else
+        {
+            // Set the queueNotEmpty event to allow waiting threads to continue
+            queueNotEmpty.Set();
+            await Task.Delay(100); // Delay before checking the logQueue again
+        }
+    }
+}
     }
 }
